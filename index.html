@@ -1,13 +1,74 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Chat Assistant</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Alternate+Gothic+No1+D&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="header-content">
+      <img src="pitt-logo.png" alt="Pitt Logo" class="logo">
+      <h1>Interactive Chat Assistant</h1>
+    </div>
+  </header>
+
+  <!-- Chat Interface -->
+  <main>
+    <div class="chat-container">
+      <div id="chat-box"></div>
+      <div class="input-area">
+        <input type="text" id="user-input" placeholder="Type your message here...">
+        <button id="send-btn">Send</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <p>University of Pittsburgh</p>
+      <p>© 2025 University of Pittsburgh. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="https://www.pitt.edu">Pitt.edu</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Use</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // JavaScript to handle sending messages to the backend
+    document.getElementById('send-btn').addEventListener('click', async () => {
+      const userInput = document.getElementById('user-input').value;
+      if (userInput.trim() === "") return;
+
+      // Add user message to chat box
+      const chatBox = document.getElementById('chat-box');
+      chatBox.innerHTML += `<div class="user-message">You: ${userInput}</div>`;
+
+      // Send message to backend (Python/Flask)
+      try {
+        const response = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: userInput })
+        });
+
+        const data = await response.json();
+        chatBox.innerHTML += `<div class="bot-message">Assistant: ${data.reply}</div>`;
+      } catch (error) {
+        console.error('Error:', error);
+        chatBox.innerHTML += `<div class="bot-message">Assistant: Sorry, something went wrong.</div>`;
+      }
+
+      // Clear input field
+      document.getElementById('user-input').value = '';
+      chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to latest message
+    });
+  </script>
+</body>
 </html>
